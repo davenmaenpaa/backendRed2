@@ -1,6 +1,7 @@
 package se.backend.groupred2.service;
 
 import org.springframework.data.domain.Page;
+
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import se.backend.groupred2.model.Issue;
@@ -24,12 +25,12 @@ public final class IssueService {
         this.taskRepository = taskRepository;
     }
 
-    public List<Task> getAllTasksWithIssues() {
-        return issueRepository.findDistinctOnTask();
-    }
+    public List<Task> getAllTasksWithIssues(int page, int limit) {
+        System.out.println("got into method");
 
-    public Page<Task> getAllTasksWithIssues(PageRequest pageRequest) {
-        return issueRepository.findDistinctOnTask(pageRequest);
+        Page<Task> pagedTasks = issueRepository.findDistinctOnTask(PageRequest.of(page, limit));
+
+        return pagedTasks.getContent();
     }
 
     public Issue createIssue(Long taskid, Issue issue) {
@@ -49,7 +50,6 @@ public final class IssueService {
         }).orElseThrow(() -> new InvalidTaskException("Task doesn't exist"));
     }
 
-    //TODO måste kolla igen
     public Optional<Issue> update(Long issueId, Issue issue) {
         Optional<Issue> result = issueRepository.findById(issueId);
 
@@ -76,5 +76,4 @@ public final class IssueService {
         if (!task.getStatus().equals(TaskStatus.DONE))
             throw new InvalidTaskException("Task does not have status Done");
     }
-
 }

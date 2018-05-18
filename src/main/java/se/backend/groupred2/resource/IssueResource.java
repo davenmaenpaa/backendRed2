@@ -1,7 +1,5 @@
 package se.backend.groupred2.resource;
 
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Component;
 import se.backend.groupred2.model.Issue;
 import se.backend.groupred2.service.IssueService;
@@ -27,8 +25,8 @@ public final class IssueResource {
 
     @GET
     @Path("issues")
-    public Response getAllTasksWithIssues(@QueryParam("p") int p, @QueryParam("l") int l) {
-        return Response.ok(service.getAllTasksWithIssues(PageRequest.of(p,l))).build();
+    public Response getAllTasksWithIssues(@QueryParam("page") @DefaultValue("0") int page , @QueryParam("limit") @DefaultValue("10") int limit) {
+        return Response.ok(service.getAllTasksWithIssues(page, limit)).build();
     }
 
     @POST
