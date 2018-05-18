@@ -1,9 +1,6 @@
 package se.backend.groupred2.model;
 
-import org.hibernate.annotations.ColumnDefault;
-
 import javax.persistence.*;
-import javax.ws.rs.DefaultValue;
 
 @Entity
 public final class Team {
