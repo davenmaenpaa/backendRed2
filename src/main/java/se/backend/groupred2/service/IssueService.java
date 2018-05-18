@@ -1,5 +1,7 @@
 package se.backend.groupred2.service;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import se.backend.groupred2.model.Issue;
 import se.backend.groupred2.model.Task;
@@ -24,6 +26,10 @@ public final class IssueService {
 
     public List<Task> getAllTasksWithIssues() {
         return issueRepository.findDistinctOnTask();
+    }
+
+    public Page<Task> getAllTasksWithIssues(PageRequest pageRequest) {
+        return issueRepository.findDistinctOnTask(pageRequest);
     }
 
     public Issue createIssue(Long taskid, Issue issue) {
