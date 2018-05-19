@@ -1,5 +1,8 @@
 package se.backend.groupred2.service;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import se.backend.groupred2.model.Task;
 import se.backend.groupred2.model.TaskStatus;
@@ -40,10 +43,10 @@ public final class TaskService {
         if (temp.isPresent()) {
             taskRepository.deleteById(id);
         }
+
         return temp;
     }
 
-    // Kan ändras så att den updaterar mer än bara status. Bör ha mer validates för att se så att rätt saker skickas in.
     public Optional<Task> updateStatus(Long id, Task task) {
         Optional<Task> taskResult = taskRepository.findById(id);
 
@@ -81,27 +84,32 @@ public final class TaskService {
         }
     }
 
-    public List<Task> getAllTasksByStatus(String status) {
+    public List<Task> getAllTasksByStatus(String status, int page, int limit) {
         validateStatus(status);
-        List<Task> tasks = taskRepository.findAllByStatus(TaskStatus.valueOf(status));
+
+        Page<Task> tasksPage = taskRepository.findAllByStatus(TaskStatus.valueOf(status), PageRequest.of(page, limit));
+
+        List<Task> tasks = tasksPage.getContent();
 
         if (tasks.isEmpty()) {
             throw new InvalidTaskException("Could not find any tasks with that status");
         }
+
         return tasks;
     }
 
-    public List<Task> getAllTasksByUserId(Long userId) {
-        List<Task> tasks = taskRepository.findAllTaskByUserId(userId);
+    public List<Task> getAllTasksByUserId(Long userId, int page, int limit) {
+        List<Task> tasks =  taskRepository.findAllTaskByUserId(userId, PageRequest.of(page, limit)).getContent();
 
         if (tasks.isEmpty()) {
             throw new InvalidTaskException("Could not find any tasks for that user");
         }
+
         return tasks;
     }
 
-    public List<Task> getAllTasksByDescription(String description) {
-        List<Task> tasks = taskRepository.findAll();
+    public List<Task> getAllTasksByDescription(String description, int page, int limit) {
+        List<Task> tasks = taskRepository.findAll(PageRequest.of(page, limit)).getContent();
 
         tasks = tasks.stream()
                 .filter(task -> task.getDescription().contains(description))
@@ -110,16 +118,22 @@ public final class TaskService {
         if (tasks.isEmpty()) {
             throw new InvalidTaskException("Could not find any tasks with that description");
         }
+
         return tasks;
     }
 
-    public List<Task> getAllTasksByTeamId(Long teamId) {
+    public List<Task> getAllTasksByTeamId(Long teamId, int page, int limit) {
+
         List<User> userResult = userRepository.findUsersByTeamId(teamId);
+
         if (userResult.isEmpty()) {
             throw new InvalidTaskException("Could not find any users for that team");
         }
+
         List<Task> allTasks = new ArrayList<>();
-        userResult.forEach(user -> allTasks.addAll(taskRepository.findAllTaskByUserId(user.getId())));
+        Pageable pageable = PageRequest.of(page, limit);
+
+        userResult.forEach(user -> allTasks.addAll(taskRepository.findAllTaskByUserId(user.getId(), pageable).getContent()));
 
         return allTasks;
     }

@@ -44,25 +44,35 @@ public final class TaskResource {
     }
 
     @GET
-    public List<Task> getAllTasksByStatus(@QueryParam("status") String status) {
-        return taskService.getAllTasksByStatus(status);
+    public List<Task> getAllTasksByStatus(@QueryParam("status") String status,
+                                          @QueryParam("page") @DefaultValue("0") int page ,
+                                          @QueryParam("limit") @DefaultValue("10") int limit) {
+        return taskService.getAllTasksByStatus(status, page, limit);
     }
 
     @GET
     @Path("team/{id}")
-    public List<Task> getAllTasksByTeam(@PathParam("id") Long teamId) {
-        return taskService.getAllTasksByTeamId(teamId);
+    public List<Task> getAllTasksByTeam(@PathParam("id") Long teamId,
+                                        @QueryParam("page") @DefaultValue("0") int page ,
+                                        @QueryParam("limit") @DefaultValue("10") int limit) {
+
+        return taskService.getAllTasksByTeamId(teamId, page, limit);
     }
 
     @GET
     @Path("user/{id}")
-    public List<Task> getAllTasksByUser(@PathParam("id") Long userId) {
-        return taskService.getAllTasksByUserId(userId);
+    public List<Task> getAllTasksByUser(@PathParam("id") Long userId,
+                                        @QueryParam("page") @DefaultValue("0") int page ,
+                                        @QueryParam("limit") @DefaultValue("10") int limit) {
+
+        return taskService.getAllTasksByUserId(userId, page, limit);
     }
 
     @GET
-    @Path("description") //queryparams för description
-    public List<Task> getAllTasksByDescription(@QueryParam("desc") String description) {
+    @Path("description")
+    public List<Task> getAllTasksByDescription(@QueryParam("desc") String description,
+                                               @QueryParam("page") @DefaultValue("0") int page ,
+                                               @QueryParam("limit") @DefaultValue("10") int limit) {
         return taskService.getAllTasksByDescription(description);
     }
 
