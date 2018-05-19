@@ -1,7 +1,6 @@
 package se.backend.groupred2.resource;
 
 import org.springframework.stereotype.Component;
-import se.backend.groupred2.model.Issue;
 import se.backend.groupred2.model.Task;
 import se.backend.groupred2.model.User;
 import se.backend.groupred2.service.IssueService;
@@ -44,19 +43,19 @@ public final class TaskResource {
     }
 
     @GET
-    public List<Task> getAllTasksByStatus(@QueryParam("status") String status,
-                                          @QueryParam("page") @DefaultValue("0") int page ,
-                                          @QueryParam("limit") @DefaultValue("10") int limit) {
+    public Iterable<Task> getAllTasks(@QueryParam("status") String status,
+                                      @QueryParam("page") @DefaultValue("0") int page,
+                                      @QueryParam("limit") @DefaultValue("10") int limit) {
+        if (status == null)
+            return taskService.getAllTasks(page, limit);
+
         return taskService.getAllTasksByStatus(status, page, limit);
     }
 
     @GET
     @Path("team/{id}")
-    public List<Task> getAllTasksByTeam(@PathParam("id") Long teamId,
-                                        @QueryParam("page") @DefaultValue("0") int page ,
-                                        @QueryParam("limit") @DefaultValue("10") int limit) {
-
-        return taskService.getAllTasksByTeamId(teamId, page, limit);
+    public List<Task> getAllTasksByTeam(@PathParam("id") Long teamId) {
+        return taskService.getAllTasksByTeamId(teamId);
     }
 
     @GET
@@ -64,7 +63,6 @@ public final class TaskResource {
     public List<Task> getAllTasksByUser(@PathParam("id") Long userId,
                                         @QueryParam("page") @DefaultValue("0") int page ,
                                         @QueryParam("limit") @DefaultValue("10") int limit) {
-
         return taskService.getAllTasksByUserId(userId, page, limit);
     }
 
@@ -73,7 +71,7 @@ public final class TaskResource {
     public List<Task> getAllTasksByDescription(@QueryParam("desc") String description,
                                                @QueryParam("page") @DefaultValue("0") int page ,
                                                @QueryParam("limit") @DefaultValue("10") int limit) {
-        return taskService.getAllTasksByDescription(description);
+        return taskService.getAllTasksByDescription(description, page, limit);
     }
 
     @DELETE

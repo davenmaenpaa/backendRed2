@@ -27,10 +27,13 @@ public final class TaskService {
         this.userRepository = userRepository;
     }
 
-    //TODO En task bör endast kunna skapas om status är: UNSTARTED, STARTED eller DONE
     public Task createTask(Task task) {
         validateTask(task);
         return taskRepository.save(new Task(task.getTitle(), task.getDescription(), task.getStatus()));
+    }
+
+    public Iterable<Task> getAllTasks(int page, int limit) {
+        return taskRepository.findAll(PageRequest.of(page, limit)).getContent();
     }
 
     public Optional<Task> getTask(Long id) {
@@ -87,9 +90,7 @@ public final class TaskService {
     public List<Task> getAllTasksByStatus(String status, int page, int limit) {
         validateStatus(status);
 
-        Page<Task> tasksPage = taskRepository.findAllByStatus(TaskStatus.valueOf(status), PageRequest.of(page, limit));
-
-        List<Task> tasks = tasksPage.getContent();
+        List<Task> tasks = taskRepository.findAllByStatus(TaskStatus.valueOf(status), PageRequest.of(page, limit)).getContent();
 
         if (tasks.isEmpty()) {
             throw new InvalidTaskException("Could not find any tasks with that status");
@@ -122,7 +123,7 @@ public final class TaskService {
         return tasks;
     }
 
-    public List<Task> getAllTasksByTeamId(Long teamId, int page, int limit) {
+    public List<Task> getAllTasksByTeamId(Long teamId) {
 
         List<User> userResult = userRepository.findUsersByTeamId(teamId);
 
@@ -131,9 +132,8 @@ public final class TaskService {
         }
 
         List<Task> allTasks = new ArrayList<>();
-        Pageable pageable = PageRequest.of(page, limit);
 
-        userResult.forEach(user -> allTasks.addAll(taskRepository.findAllTaskByUserId(user.getId(), pageable).getContent()));
+        userResult.forEach(user -> allTasks.addAll(taskRepository.findAllTaskByUserId(user.getId())));
 
         return allTasks;
     }
@@ -144,7 +144,7 @@ public final class TaskService {
         }  //lägg till så att man kollar om status är korrekt också.
     }
 
-    public void validateStatus(String status) {
+    private void validateStatus(String status) {
         if (!status.equals("UNSTARTED") && !status.equals("STARTED") && !status.equals("DONE")) {
             throw new InvalidTaskException("Incorrect status, have to be UNSTARTED, STARTED or DONE");
         }
