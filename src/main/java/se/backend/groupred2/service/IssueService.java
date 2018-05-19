@@ -1,7 +1,5 @@
 package se.backend.groupred2.service;
 
-import org.springframework.data.domain.Page;
-
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import se.backend.groupred2.model.Issue;
@@ -12,7 +10,6 @@ import se.backend.groupred2.repository.TaskRepository;
 import se.backend.groupred2.service.exceptions.InvalidInputException;
 import se.backend.groupred2.service.exceptions.InvalidTaskException;
 
-import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -25,12 +22,8 @@ public final class IssueService {
         this.taskRepository = taskRepository;
     }
 
-    public List<Task> getAllTasksWithIssues(int page, int limit) {
-        System.out.println("got into method");
-
-        Page<Task> pagedTasks = issueRepository.findDistinctOnTask(PageRequest.of(page, limit));
-
-        return pagedTasks.getContent();
+    public Iterable<Task> getAllTasksWithIssues(int page, int limit) {
+        return issueRepository.findDistinctOnTask(PageRequest.of(page, limit));
     }
 
     public Issue createIssue(Long taskid, Issue issue) {

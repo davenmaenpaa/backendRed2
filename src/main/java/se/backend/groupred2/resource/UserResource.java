@@ -16,8 +16,6 @@ import static javax.ws.rs.core.Response.Status.*;
 @Produces(APPLICATION_JSON)
 @Path("users")
 public final class UserResource {
-
-
     private final UserService service;
 
     public UserResource(UserService service) {
@@ -30,8 +28,6 @@ public final class UserResource {
         return Response.status(CREATED).header("Location", "Users/" + result.getId()).build();
     }
 
-
-    // users/update     vi mÃ¥ste skicka id och user
     @PUT
     @Path("update")
     public Response update(User user) {
@@ -42,8 +38,6 @@ public final class UserResource {
                 .build();
     }
 
-
-    // users/deactivate         vi mÃ¥ste skicka id bara
     @PUT
     @Path("deactivate")
     public Response deActivate(User user) {
@@ -54,22 +48,24 @@ public final class UserResource {
                 .build();
     }
 
-
     @GET
-    public Response getUserByUserNamefirstNameLastName(
+    public Response getUsers(
             @QueryParam("usernumber") @DefaultValue("0") long usernumber,
             @QueryParam("userName") @DefaultValue("0") String userName,
             @QueryParam("firstName") @DefaultValue("0") String firstName,
-            @QueryParam("lastName") @DefaultValue("0") String lastName) {
+            @QueryParam("lastName") @DefaultValue("0") String lastName,
+            @QueryParam("page") @DefaultValue("0") int page,
+            @QueryParam("limit") @DefaultValue("10") int limit) {
+
+        if (usernumber == 0 && userName.equals("0") && firstName.equals("0") && lastName.equals("0"))
+            return Response.ok(service.getAllUsers(page, limit)).build();
+
         return Response.ok(service.getUserByUserNamefirstNameLastName(usernumber, userName, firstName, lastName)).build();
     }
-
 
     @GET
     @Path("getByTeamId/{id}")
     public List<User> getAllUserByTeamId(@PathParam("id") Long teamId) {
         return service.getALLUserByteamId(teamId);
     }
-
-
 }

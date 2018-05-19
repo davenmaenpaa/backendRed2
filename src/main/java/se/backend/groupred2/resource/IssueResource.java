@@ -25,7 +25,7 @@ public final class IssueResource {
 
     @GET
     @Path("issues")
-    public Response getAllTasksWithIssues(@QueryParam("page") @DefaultValue("0") int page , @QueryParam("limit") @DefaultValue("10") int limit) {
+    public Response getAllTasksWithIssues(@QueryParam("page") @DefaultValue("0") int page, @QueryParam("limit") @DefaultValue("10") int limit) {
         return Response.ok(service.getAllTasksWithIssues(page, limit)).build();
     }
 

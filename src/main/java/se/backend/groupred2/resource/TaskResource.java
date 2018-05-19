@@ -43,13 +43,13 @@ public final class TaskResource {
     }
 
     @GET
-    public Iterable<Task> getAllTasks(@QueryParam("status") String status,
+    public Response getAllTasks(@QueryParam("status") String status,
                                       @QueryParam("page") @DefaultValue("0") int page,
                                       @QueryParam("limit") @DefaultValue("10") int limit) {
         if (status == null)
-            return taskService.getAllTasks(page, limit);
+            return Response.ok(taskService.getAllTasks(page, limit)).build();
 
-        return taskService.getAllTasksByStatus(status, page, limit);
+        return Response.ok(taskService.getAllTasksByStatus(status, page, limit)).build();
     }
 
     @GET
