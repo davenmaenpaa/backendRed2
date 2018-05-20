@@ -2,10 +2,12 @@ package se.backend.groupred2.resource;
 
 import org.springframework.stereotype.Component;
 import se.backend.groupred2.model.User;
+import se.backend.groupred2.resource.filter.AuthBinding;
 import se.backend.groupred2.service.UserService;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
+import javax.xml.ws.Action;
 import java.util.List;
 
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
@@ -23,6 +25,7 @@ public final class UserResource {
     }
 
     @POST
+    @AuthBinding
     public Response createUser(User user) {
         User result = service.createUser(user);
         return Response.status(CREATED).header("Location", "Users/" + result.getId()).build();

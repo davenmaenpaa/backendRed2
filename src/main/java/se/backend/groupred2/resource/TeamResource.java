@@ -3,6 +3,7 @@ package se.backend.groupred2.resource;
 import org.springframework.stereotype.Component;
 import se.backend.groupred2.model.Team;
 import se.backend.groupred2.model.User;
+import se.backend.groupred2.resource.filter.AuthBinding;
 import se.backend.groupred2.service.TeamService;
 
 import javax.ws.rs.*;
@@ -32,6 +33,7 @@ public final class TeamResource {
     }
 
     @POST
+    @AuthBinding
     public Response createTeam(Team team) {
         Team result = service.createTeam(team);
         return Response.status(CREATED).header("Location", "Team/" + result.getId()).build();
