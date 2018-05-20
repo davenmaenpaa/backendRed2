@@ -1,6 +1,6 @@
 package se.backend.groupred2.service.exceptions;
 
-public class InvalidInputException extends RuntimeException {
+public final class InvalidInputException extends RuntimeException {
 
     public InvalidInputException(String message) {
         super(message);

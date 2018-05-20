@@ -5,7 +5,7 @@ import se.backend.groupred2.model.Task.Task;
 import javax.persistence.*;
 
 @Entity
-public class Issue {
+public final class Issue {
 
     @Id
     @GeneratedValue(strategy=GenerationType.IDENTITY)

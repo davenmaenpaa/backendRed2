@@ -93,6 +93,7 @@ public final class UserService {
         } else {
             throw new InvalidUserException("fel");
         }
+
         return null;
     }
 

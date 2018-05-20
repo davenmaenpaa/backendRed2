@@ -4,7 +4,6 @@ import org.springframework.stereotype.Component;
 import se.backend.groupred2.model.Issue;
 import se.backend.groupred2.model.Task.Task;
 import se.backend.groupred2.model.Task.TaskStatus;
-import se.backend.groupred2.repository.TaskRepository;
 import se.backend.groupred2.service.IssueService;
 import se.backend.groupred2.service.TaskService;
 
