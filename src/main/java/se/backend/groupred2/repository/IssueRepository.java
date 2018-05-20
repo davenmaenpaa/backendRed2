@@ -5,7 +5,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import se.backend.groupred2.model.Issue;
-import se.backend.groupred2.model.Task;
+import se.backend.groupred2.model.Task.Task;
 
 public interface IssueRepository extends PagingAndSortingRepository<Issue, Long> {
 

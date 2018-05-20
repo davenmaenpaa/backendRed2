@@ -1,5 +1,7 @@
 package se.backend.groupred2.model;
 
+import se.backend.groupred2.model.Task.Task;
+
 import javax.persistence.*;
 
 @Entity

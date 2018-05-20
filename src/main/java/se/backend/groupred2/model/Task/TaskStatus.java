@@ -1,7 +1,7 @@
-package se.backend.groupred2.model;
+package se.backend.groupred2.model.Task;
 
 public enum TaskStatus {
     UNSTARTED,
     STARTED,
-    DONE;
+    DONE
 }

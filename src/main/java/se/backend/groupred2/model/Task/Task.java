@@ -1,6 +1,7 @@
-package se.backend.groupred2.model;
+package se.backend.groupred2.model.Task;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import se.backend.groupred2.model.User;
 
 import javax.persistence.*;
 
@@ -14,7 +15,6 @@ public final class Task {
     @Column(nullable = false)
     private String title, description;
 
-    @Column
     @Enumerated(EnumType.STRING)
     private TaskStatus status;
 
@@ -27,6 +27,10 @@ public final class Task {
     public Task(String title, String description, TaskStatus status) {
         this.title = title;
         this.description = description;
+        this.status = status;
+    }
+
+    public Task(TaskStatus status) {
         this.status = status;
     }
 

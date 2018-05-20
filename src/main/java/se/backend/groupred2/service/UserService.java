@@ -2,8 +2,8 @@ package se.backend.groupred2.service;
 
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
-import se.backend.groupred2.model.Task;
-import se.backend.groupred2.model.TaskStatus;
+import se.backend.groupred2.model.Task.Task;
+import se.backend.groupred2.model.Task.TaskStatus;
 import se.backend.groupred2.model.User;
 import se.backend.groupred2.repository.TaskRepository;
 import se.backend.groupred2.repository.UserRepository;

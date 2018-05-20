@@ -2,7 +2,11 @@ package se.backend.groupred2.resource;
 
 import org.springframework.stereotype.Component;
 import se.backend.groupred2.model.Issue;
+import se.backend.groupred2.model.Task.Task;
+import se.backend.groupred2.model.Task.TaskStatus;
+import se.backend.groupred2.repository.TaskRepository;
 import se.backend.groupred2.service.IssueService;
+import se.backend.groupred2.service.TaskService;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
@@ -17,22 +21,26 @@ import static javax.ws.rs.core.Response.Status.OK;
 @Produces(APPLICATION_JSON)
 @Path("tasks")
 public final class IssueResource {
-    private final IssueService service;
+    private final IssueService issueService;
+    private final TaskService taskService;
 
-    public IssueResource(IssueService service) {
-        this.service = service;
+    public IssueResource(IssueService issueService, TaskService taskService) {
+        this.issueService = issueService;
+        this.taskService = taskService;
     }
 
     @GET
     @Path("issues")
     public Response getAllTasksWithIssues(@QueryParam("page") @DefaultValue("0") int page, @QueryParam("limit") @DefaultValue("10") int limit) {
-        return Response.ok(service.getAllTasksWithIssues(page, limit)).build();
+        return Response.ok(issueService.getAllTasksWithIssues(page, limit)).build();
     }
 
     @POST
     @Path("{id}/issues")
     public Response createIssue(@PathParam("id") Long taskId, Issue issue) {
-        Issue result = service.createIssue(taskId, issue);
+        Issue result = issueService.createIssue(taskId, issue);
+
+        taskService.updateStatus(taskId, new Task(TaskStatus.UNSTARTED));
 
         return Response.status(CREATED).header("Location", "Teams/Issues/" + result.getId()).build();
     }
@@ -40,7 +48,7 @@ public final class IssueResource {
     @PUT
     @Path("issues/{id}")
     public Response update(@PathParam("id") Long id, Issue issue) {
-        return service.update(id, issue)
+        return issueService.update(id, issue)
                 .map(t -> Response.status(OK))
                 .orElse(Response.status(NOT_FOUND))
                 .build();

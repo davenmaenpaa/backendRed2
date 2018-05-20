@@ -3,8 +3,8 @@ package se.backend.groupred2.service;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import se.backend.groupred2.model.Issue;
-import se.backend.groupred2.model.Task;
-import se.backend.groupred2.model.TaskStatus;
+import se.backend.groupred2.model.Task.Task;
+import se.backend.groupred2.model.Task.TaskStatus;
 import se.backend.groupred2.repository.IssueRepository;
 import se.backend.groupred2.repository.TaskRepository;
 import se.backend.groupred2.service.exceptions.InvalidInputException;
@@ -34,7 +34,7 @@ public final class IssueService {
 
             validate(task);
 
-            t.setStatus(TaskStatus.UNSTARTED);
+//            t.setStatus(TaskStatus.UNSTARTED);
             taskRepository.save(task);
 
             issue.setTask(task);

@@ -2,13 +2,16 @@ package se.backend.groupred2.service;
 
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
-import se.backend.groupred2.model.Task;
-import se.backend.groupred2.model.TaskStatus;
+import se.backend.groupred2.model.Task.Task;
+import se.backend.groupred2.model.Task.TaskStatus;
+import se.backend.groupred2.model.Task.TaskStatusDate;
 import se.backend.groupred2.model.User;
 import se.backend.groupred2.repository.TaskRepository;
+import se.backend.groupred2.repository.TaskStatusRepository;
 import se.backend.groupred2.repository.UserRepository;
 import se.backend.groupred2.service.exceptions.InvalidTaskException;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -19,10 +22,12 @@ public final class TaskService {
 
     private final TaskRepository taskRepository;
     private final UserRepository userRepository;
+    private final TaskStatusRepository taskStatusRepository;
 
-    public TaskService(TaskRepository taskRepository, UserRepository userRepository) {
+    public TaskService(TaskRepository taskRepository, UserRepository userRepository, TaskStatusRepository taskStatusRepository) {
         this.taskRepository = taskRepository;
         this.userRepository = userRepository;
+        this.taskStatusRepository = taskStatusRepository;
     }
 
     public Task createTask(Task task) {
@@ -52,13 +57,20 @@ public final class TaskService {
         Optional<Task> taskResult = taskRepository.findById(id);
 
         if (taskResult.isPresent()) {
+
             Task updatedTask = taskResult.get();
 
             updatedTask.setStatus(task.getStatus());
+
+            TaskStatusDate taskStatus = new TaskStatusDate(updatedTask, LocalDate.now(), updatedTask.getStatus());
+
+            taskStatusRepository.save(taskStatus);
             taskRepository.save(updatedTask);
+
         } else {
             throw new InvalidTaskException("Could not find that task");
         }
+
         return taskResult;
     }
 
