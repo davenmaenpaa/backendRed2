@@ -3,6 +3,7 @@ package se.backend.groupred2.resource;
 import org.springframework.stereotype.Component;
 import se.backend.groupred2.model.Task.Task;
 import se.backend.groupred2.model.User;
+import se.backend.groupred2.resource.filter.AuthBinding;
 import se.backend.groupred2.service.IssueService;
 import se.backend.groupred2.service.TaskService;
 
@@ -24,6 +25,7 @@ public final class TaskResource {
         this.taskService = taskService;
     }
 
+    @AuthBinding
     @POST
     public Response createTask(Task task) {
 

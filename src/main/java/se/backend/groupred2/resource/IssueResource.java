@@ -4,7 +4,7 @@ import org.springframework.stereotype.Component;
 import se.backend.groupred2.model.Issue;
 import se.backend.groupred2.model.Task.Task;
 import se.backend.groupred2.model.Task.TaskStatus;
-import se.backend.groupred2.repository.TaskRepository;
+import se.backend.groupred2.resource.filter.AuthBinding;
 import se.backend.groupred2.service.IssueService;
 import se.backend.groupred2.service.TaskService;
 
@@ -36,6 +36,7 @@ public final class IssueResource {
     }
 
     @POST
+    @AuthBinding
     @Path("{id}/issues")
     public Response createIssue(@PathParam("id") Long taskId, Issue issue) {
         Issue result = issueService.createIssue(taskId, issue);

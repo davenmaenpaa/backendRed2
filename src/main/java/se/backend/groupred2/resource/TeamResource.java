@@ -3,6 +3,7 @@ package se.backend.groupred2.resource;
 import org.springframework.stereotype.Component;
 import se.backend.groupred2.model.Team;
 import se.backend.groupred2.model.User;
+import se.backend.groupred2.resource.filter.AuthBinding;
 import se.backend.groupred2.service.TeamService;
 
 import javax.ws.rs.*;
@@ -32,16 +33,15 @@ public final class TeamResource {
     }
 
     @POST
+    @AuthBinding
     public Response createTeam(Team team) {
         Team result = service.createTeam(team);
-
         return Response.status(CREATED).header("Location", "Team/" + result.getId()).build();
     }
 
     @PUT
     @Path("{id}/users/")
     public Response addUser(@PathParam("id") Long teamId, User user) {
-
         return service.addUser(teamId, user.getId())
                 .map(u -> Response.status(OK))
                 .orElse(Response.status((NOT_FOUND)))
@@ -51,7 +51,6 @@ public final class TeamResource {
     @PUT
     @Path("{id}")
     public Response update(@PathParam("id") Long teamId, Team team) {
-
         return service.update(teamId, team)
                 .map(t -> Response.status(OK))
                 .orElse(Response.status(NOT_FOUND))
@@ -61,7 +60,6 @@ public final class TeamResource {
     @PUT
     @Path("{id}/deactivate")
     public Response deActivate(@PathParam("id") Long teamId) {
-
         return service.deActivate(teamId)
                 .map(t -> Response.status(OK))
                 .orElse(Response.status(NOT_FOUND))

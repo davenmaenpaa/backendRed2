@@ -34,7 +34,6 @@ public final class IssueService {
 
             validate(task);
 
-//            t.setStatus(TaskStatus.UNSTARTED);
             taskRepository.save(task);
 
             issue.setTask(task);
@@ -47,7 +46,7 @@ public final class IssueService {
         Optional<Issue> result = issueRepository.findById(issueId);
 
         return result.map(i -> {
-            if (issue.getTitle() != null&& issue.getDescription() != null) {
+            if (issue.getTitle() != null && issue.getDescription() != null) {
                 i.setTitle(issue.getTitle());
                 i.setDescription(issue.getDescription());
 
@@ -56,7 +55,6 @@ public final class IssueService {
 
             } else if (issue.getDescription() != (null)) {
                 i.setDescription(issue.getDescription());
-
             }
 
             issueRepository.save(result.get());
