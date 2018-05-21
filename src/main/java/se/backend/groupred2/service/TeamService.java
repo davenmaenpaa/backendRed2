@@ -5,10 +5,9 @@ import se.backend.groupred2.model.Team;
 import se.backend.groupred2.model.User;
 import se.backend.groupred2.repository.TeamRepository;
 import se.backend.groupred2.repository.UserRepository;
-import se.backend.groupred2.service.exceptions.InvalidInputException;
-import se.backend.groupred2.service.exceptions.InvalidTeamException;
-import se.backend.groupred2.service.exceptions.InvalidUserException;
+import se.backend.groupred2.service.exceptions.*;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -55,8 +54,13 @@ public final class TeamService {
         return result;
     }
 
-    public Iterable<Team> getAllTeams() {
-        return teamRepository.findAll();
+    public List<Team> getAllTeams() {
+        List<Team> teams = teamRepository.findAll();
+
+        if (teamRepository.findAll().isEmpty())
+            throw new NoContentException();
+
+        return teams;
     }
 
     public Team getTeam(Long teamId) {
