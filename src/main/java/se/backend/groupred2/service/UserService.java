@@ -109,12 +109,8 @@ public final class UserService {
     private void validate(User user) {
         int userNameLength = user.getUserName().length();
 
-        if (userNameLength < 10) {
+        if (userNameLength < 10)
             throw new InvalidUserException("Username has to be at least 10 tokens");
-        }
-//        else if (user.getUserName().isEmpty() && user.getUserName() == null) {
-//            throw new InvalidUserException("userName is Empty");
-//        }
     }
 }
 
