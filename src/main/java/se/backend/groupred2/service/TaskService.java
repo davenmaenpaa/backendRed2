@@ -11,6 +11,11 @@ import se.backend.groupred2.repository.TaskStatusRepository;
 import se.backend.groupred2.repository.UserRepository;
 import se.backend.groupred2.service.exceptions.InvalidTaskException;
 
+import javax.ws.rs.client.Client;
+import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.client.Entity;
+import javax.ws.rs.client.WebTarget;
+import javax.ws.rs.core.MediaType;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -31,7 +36,8 @@ public final class TaskService {
 
     public Task createTask(Task task) {
         validateTask(task);
-        return taskRepository.save(new Task(task.getTitle(), task.getDescription(), task.getStatus()));
+
+        return serverSideEvent(taskRepository.save(new Task(task.getTitle(), task.getDescription(), task.getStatus())));
     }
 
     public Iterable<Task> getAllTasks(int page, int limit) {
@@ -109,7 +115,7 @@ public final class TaskService {
     }
 
     public List<Task> getAllTasksByUserId(Long userId, int page, int limit) {
-        List<Task> tasks =  taskRepository.findAllTaskByUserId(userId, PageRequest.of(page, limit)).getContent();
+        List<Task> tasks = taskRepository.findAllTaskByUserId(userId, PageRequest.of(page, limit)).getContent();
 
         if (tasks.isEmpty()) {
             throw new InvalidTaskException("Could not find any tasks for that user");
@@ -157,6 +163,17 @@ public final class TaskService {
         if (!status.equals("UNSTARTED") && !status.equals("STARTED") && !status.equals("DONE")) {
             throw new InvalidTaskException("Incorrect status, have to be UNSTARTED, STARTED or DONE");
         }
+    }
+
+    private Task serverSideEvent(Task task) {
+        Client client = ClientBuilder.newClient();
+
+        WebTarget target = client.target("http://localhost:8080").path("tasks/events");
+
+        target.request(MediaType.TEXT_PLAIN_TYPE)
+                .post(Entity.entity(task.toString(), MediaType.TEXT_PLAIN));
+
+        return task;
     }
 
 }
