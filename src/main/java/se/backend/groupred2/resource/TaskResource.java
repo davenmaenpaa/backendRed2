@@ -19,11 +19,9 @@ import static javax.ws.rs.core.Response.Status.*;
 @Path("tasks")
 public final class TaskResource {
     private final TaskService taskService;
-    private final IssueService issueService;
 
-    public TaskResource(TaskService taskService, IssueService issueService) {
+    public TaskResource(TaskService taskService) {
         this.taskService = taskService;
-        this.issueService = issueService;
     }
 
     @POST
