@@ -3,14 +3,12 @@ package se.backend.groupred2.model.Task;
 import javax.persistence.*;
 import java.time.LocalDate;
 
-//en taskstatus ska kunna ha fler tasks
 @Entity
 public final class TaskStatusDate {
 
     @Id
     @GeneratedValue(strategy=GenerationType.IDENTITY)
     private long id;
-
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private Task task;
