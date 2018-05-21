@@ -23,7 +23,7 @@ public final class IssueService {
     }
 
     public Iterable<Task> getAllTasksWithIssues(int page, int limit) {
-        return issueRepository.findDistinctOnTask(PageRequest.of(page, limit));
+        return issueRepository.findDistinctOnTask(PageRequest.of(page, limit)).getContent();
     }
 
     public Issue createIssue(Long taskid, Issue issue) {
