@@ -8,6 +8,11 @@ import se.backend.groupred2.service.IssueService;
 import se.backend.groupred2.service.TaskService;
 
 import javax.ws.rs.*;
+import javax.ws.rs.client.Client;
+import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.client.Entity;
+import javax.ws.rs.client.WebTarget;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.List;
 
@@ -100,7 +105,6 @@ public final class TaskResource {
                 .orElse(Response.status(NOT_FOUND))
                 .build();
     }
-
 }
 
 
