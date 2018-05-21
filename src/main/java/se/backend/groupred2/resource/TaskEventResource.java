@@ -1,43 +1,48 @@
 package se.backend.groupred2.resource;
 
+import org.glassfish.jersey.media.sse.EventOutput;
+import org.glassfish.jersey.media.sse.OutboundEvent;
+import org.glassfish.jersey.media.sse.SseFeature;
+
 import javax.inject.Singleton;
 import javax.ws.rs.*;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.sse.OutboundSseEvent;
-import javax.ws.rs.sse.Sse;
-import javax.ws.rs.sse.SseBroadcaster;
-import javax.ws.rs.sse.SseEventSink;
+import java.io.IOException;
+import java.util.concurrent.TimeUnit;
 
 @Singleton
 @Path("tasks/events")
 public final class TaskEventResource {
-    private Sse sse;
-    private SseBroadcaster broadcaster;
-
-    public TaskEventResource(@Context final Sse sse) {
-        this.sse = sse;
-        this.broadcaster = sse.newBroadcaster();
-    }
-
-    @POST
-    @Produces(MediaType.TEXT_PLAIN)
-    @Consumes(MediaType.TEXT_PLAIN)
-    public String broadcastMessage(String message) {
-        final OutboundSseEvent event = sse.newEventBuilder()
-                .name("message")
-                .mediaType(MediaType.TEXT_PLAIN_TYPE)
-                .data(String.class, message)
-                .build();
-
-        broadcaster.broadcast(event);
-
-        return "Message '" + message + "' has been broadcast.";
-    }
 
     @GET
-    @Produces(MediaType.SERVER_SENT_EVENTS)
-    public void listenToBroadcast(@Context SseEventSink eventSink) {
-        this.broadcaster.register(eventSink);
+    @Produces(SseFeature.SERVER_SENT_EVENTS)
+    public EventOutput getServerSentEvents() {
+        final EventOutput eventOutput = new EventOutput();
+        new Thread(() -> {
+            try {
+                for (int i = 0; i < 10; i++) {
+
+                    try {
+                        TimeUnit.SECONDS.sleep(1);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+
+                    final OutboundEvent.Builder eventBuilder = new OutboundEvent.Builder();
+                    eventBuilder.name("message-to-client");
+                    eventBuilder.data(String.class, "Hello world " + i + "!");
+                    final OutboundEvent event = eventBuilder.build();
+                    eventOutput.write(event);
+                }
+            } catch (IOException e) {
+                throw new RuntimeException("Error when writing the event.", e);
+            } finally {
+                try {
+                    eventOutput.close();
+                } catch (IOException ioClose) {
+                    throw new RuntimeException("Error when closing the event output.", ioClose);
+                }
+            }
+        }).start();
+        return eventOutput;
     }
 }
