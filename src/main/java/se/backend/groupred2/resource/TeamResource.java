@@ -1,13 +1,18 @@
 package se.backend.groupred2.resource;
 
 import org.springframework.stereotype.Component;
+import se.backend.groupred2.model.Task.Task;
 import se.backend.groupred2.model.Team;
 import se.backend.groupred2.model.User;
 import se.backend.groupred2.resource.filter.AuthBinding;
+import se.backend.groupred2.service.TaskService;
 import se.backend.groupred2.service.TeamService;
+import se.backend.groupred2.service.UserService;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
+
+import java.util.List;
 
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 import static javax.ws.rs.core.Response.Status.*;
@@ -17,33 +22,49 @@ import static javax.ws.rs.core.Response.Status.*;
 @Produces(APPLICATION_JSON)
 @Path("teams")
 public final class TeamResource {
-    private final TeamService service;
+    private final TeamService teamService;
+    private final UserService userService;
+    private final TaskService taskService;
 
-    public TeamResource(TeamService service) {
-        this.service = service;
+    public TeamResource(TeamService teamService, UserService userService, TaskService taskService) {
+        this.teamService = teamService;
+        this.userService = userService;
+        this.taskService = taskService;
+    }
+
+    @GET
+    public Response getAllTeams() {
+        return Response.ok(teamService.getAllTeams()).build();
     }
 
     @GET
     @Path("{id}")
-    public Response getTeam(@PathParam("id") Long id) { return Response.ok(service.getTeam(id)).build(); }
+    public Response getTeam(@PathParam("id") Long id) { return Response.ok(teamService.getTeam(id)).build(); }
 
     @GET
-    public Response getAllTeams() {
-        return Response.ok(service.getAllTeams()).build();
+    @Path("{id}/users")
+    public List<User> getAllUserByTeamId(@PathParam("id") Long teamId) {
+        return userService.getAllUserByTeam(teamId);
+    }
+
+    @GET
+    @Path("{id}/tasks")
+    public List<Task> getAllTasksByTeam(@PathParam("id") Long teamId) {
+        return taskService.getAllTasksByTeamId(teamId);
     }
 
     @POST
     @AuthBinding
     public Response createTeam(Team team) {
-        Team result = service.createTeam(team);
+        Team result = teamService.createTeam(team);
 
         return Response.status(CREATED).header("Location", "Team/" + result.getId()).build();
     }
 
     @PUT
     @Path("{id}/users/")
-    public Response addUser(@PathParam("id") Long teamId, User user) {
-        return service.addUser(teamId, user.getId())
+    public Response addUserToTeam(@PathParam("id") Long teamId, User user) {
+        return teamService.addUserToTeam(teamId, user.getId())
                 .map(u -> Response.status(OK))
                 .orElse(Response.status((NOT_FOUND)))
                 .build();
@@ -52,7 +73,7 @@ public final class TeamResource {
     @PUT
     @Path("{id}")
     public Response update(@PathParam("id") Long teamId, Team team) {
-        return service.update(teamId, team)
+        return teamService.update(teamId, team)
                 .map(t -> Response.status(OK))
                 .orElse(Response.status(NOT_FOUND))
                 .build();
@@ -61,7 +82,7 @@ public final class TeamResource {
     @PUT
     @Path("{id}/deactivate")
     public Response deActivate(@PathParam("id") Long teamId) {
-        return service.deActivate(teamId)
+        return teamService.deActivate(teamId)
                 .map(t -> Response.status(OK))
                 .orElse(Response.status(NOT_FOUND))
                 .build();

@@ -14,6 +14,6 @@ public final class InvalidInputMapper implements ExceptionMapper<InvalidInputExc
 
     @Override
     public Response toResponse(InvalidInputException exception) {
-        return Response.status(BAD_REQUEST).entity(singletonMap("Error!", exception.getMessage())).build();
+        return Response.status(BAD_REQUEST).build();
     }
 }

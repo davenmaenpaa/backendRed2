@@ -9,6 +9,7 @@ import se.backend.groupred2.model.User;
 import se.backend.groupred2.repository.TaskRepository;
 import se.backend.groupred2.repository.TaskStatusRepository;
 import se.backend.groupred2.repository.UserRepository;
+import se.backend.groupred2.service.exceptions.InvalidInputException;
 import se.backend.groupred2.service.exceptions.InvalidTaskException;
 
 import javax.ws.rs.client.Client;
@@ -49,13 +50,10 @@ public final class TaskService {
     }
 
     public Optional<Task> deleteTask(Long id) {
-        Optional<Task> temp = taskRepository.findById(id);
+        Optional<Task> result = taskRepository.findById(id);
+        result.ifPresent(task -> taskRepository.deleteById(id));
 
-        if (temp.isPresent()) {
-            taskRepository.deleteById(id);
-        }
-
-        return temp;
+        return result;
     }
 
     public Optional<Task> updateStatus(Long id, Task task) {
@@ -64,9 +62,7 @@ public final class TaskService {
         if (taskResult.isPresent()) {
 
             Task updatedTask = taskResult.get();
-
             updatedTask.setStatus(task.getStatus());
-
             TaskStatusDate taskStatus = new TaskStatusDate(updatedTask, LocalDate.now(), updatedTask.getStatus());
 
             taskStatusRepository.save(taskStatus);
@@ -79,7 +75,7 @@ public final class TaskService {
         return taskResult;
     }
 
-    public Optional<Task> assignTaskToUser(Long id, Long userId) {
+    public Optional<Task> addUserToTask(Long id, Long userId) {
         Optional<Task> taskResult = taskRepository.findById(id);
         Optional<User> userResult = userRepository.findById(userId);
 
@@ -88,6 +84,7 @@ public final class TaskService {
         if (taskResult.isPresent() && userResult.isPresent()) {
             if (!userResult.get().isActive()) {
                 throw new InvalidTaskException("That user is not active");
+
             } else if (taskItems.size() > 4) {
                 throw new InvalidTaskException("To many tasks for that user, Max = 5");
             }
@@ -139,30 +136,25 @@ public final class TaskService {
     }
 
     public List<Task> getAllTasksByTeamId(Long teamId) {
-
         List<User> userResult = userRepository.findUsersByTeamId(teamId);
 
-        if (userResult.isEmpty()) {
-            throw new InvalidTaskException("Could not find any users for that team");
-        }
+        if (userResult.isEmpty())
+            throw new InvalidTaskException("Could not find any tasks for that team");
 
         List<Task> allTasks = new ArrayList<>();
-
         userResult.forEach(user -> allTasks.addAll(taskRepository.findAllTaskByUserId(user.getId())));
 
         return allTasks;
     }
 
     private void validateTask(Task task) {
-        if (task.getTitle().isEmpty() || task.getTitle() == null || task.getDescription() == null || task.getStatus() == null) {
-            throw new InvalidTaskException("Title, description and status have to have values. Can not leave empty");
-        }
+        if (task.getTitle() == null || task.getTitle().isEmpty() || task.getDescription() == null || task.getStatus() == null)
+            throw new InvalidInputException();
     }
 
     private void validateStatus(String status) {
-        if (!status.equals("UNSTARTED") && !status.equals("STARTED") && !status.equals("DONE")) {
+        if (!status.equals("UNSTARTED") && !status.equals("STARTED") && !status.equals("DONE"))
             throw new InvalidTaskException("Incorrect status, have to be UNSTARTED, STARTED or DONE");
-        }
     }
 
     private Task serverSideEvent(Task task) {

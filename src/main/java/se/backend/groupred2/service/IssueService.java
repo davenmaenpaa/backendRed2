@@ -58,11 +58,11 @@ public final class IssueService {
             issueRepository.save(result.get());
 
             return result;
-        }).orElseThrow(() -> new InvalidInputException("Issue does not exist."));
+        }).orElseThrow(InvalidInputException::new);
     }
 
     private void validate(Task task) {
         if (!task.getStatus().equals(TaskStatus.DONE))
-            throw new InvalidTaskException("Task does not have status Done");
+            throw new InvalidTaskException("Task does not have status DONE");
     }
 }

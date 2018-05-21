@@ -7,6 +7,7 @@ import se.backend.groupred2.model.Task.TaskStatus;
 import se.backend.groupred2.model.User;
 import se.backend.groupred2.repository.TaskRepository;
 import se.backend.groupred2.repository.UserRepository;
+import se.backend.groupred2.service.exceptions.InvalidInputException;
 import se.backend.groupred2.service.exceptions.InvalidUserException;
 
 import java.util.List;
@@ -36,6 +37,7 @@ public final class UserService {
 
     public Optional<User> update(User user) {
         validate(user);
+
         Optional<User> result = userRepository.findById(user.getId());
 
         result.ifPresent(t -> {
@@ -89,33 +91,31 @@ public final class UserService {
             return userRepository.findByUserNumber(userNumber);
 
         } else {
-            throw new InvalidUserException("fel");
+            throw new InvalidInputException();
         }
 
         return null;
     }
 
-    public List<User> getALLUserByteamId(Long id) {
-
+    public List<User> getAllUserByTeam(Long id) {
         List<User> user = userRepository.findUsersByTeamId(id);
-        if (user.isEmpty())
-            throw new InvalidUserException("den e tom");
 
-        return userRepository.findAll().stream()  //gÃ¶r om detta till en strÃ¶m
-                .filter(t -> t.getTeam().getId().equals(id)) //behÃ¥ll alla teams med det hÃ¤r idt
-                .collect(Collectors.toList()); //gÃ¶r om strÃ¶mmen till en lista
+        if (user.isEmpty())
+            throw new InvalidUserException("No users found for that team.");
+
+        return user;
     }
 
     private void validate(User user) {
-        int UserName = user.getUserName().length();
-        if (UserName < 10) {
-            throw new InvalidUserException("UserName är minst än 10 token");
-        } else if (user.getUserName().isEmpty() && user.getUserName() == null) {
-            throw new InvalidUserException("userName is Empty");
+        int userNameLength = user.getUserName().length();
 
+        if (userNameLength < 10) {
+            throw new InvalidUserException("Username has to be at least 10 tokens");
         }
+//        else if (user.getUserName().isEmpty() && user.getUserName() == null) {
+//            throw new InvalidUserException("userName is Empty");
+//        }
     }
-
 }
 
 

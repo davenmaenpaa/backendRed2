@@ -71,7 +71,7 @@ public final class TeamService {
         return team;
     }
 
-    public Optional<User> addUser(Long teamId, Long userId) {
+    public Optional<User> addUserToTeam(Long teamId, Long userId) {
         Optional<Team> teamResult = teamRepository.findById(teamId);
         Optional<User> userResult = userRepository.findById(userId);
 
@@ -86,7 +86,7 @@ public final class TeamService {
             userRepository.save(user);
 
         } else if(!teamResult.isPresent() && !userResult.isPresent()) {
-            throw new InvalidInputException("Team and User does not exist");
+            throw new InvalidInputException();
 
         } else if(!teamResult.isPresent()) {
             throw new InvalidTeamException("Team does not exist.");
