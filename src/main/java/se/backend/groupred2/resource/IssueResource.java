@@ -59,6 +59,4 @@ public final class IssueResource {
                 .orElse(Response.status(NOT_FOUND))
                 .build();
     }
-
-
 }

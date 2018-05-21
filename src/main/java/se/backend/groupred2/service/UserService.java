@@ -25,14 +25,12 @@ public final class UserService {
 
     public User createUser(User user) {
         validate(user);
+
         return userRepository.save(new User(user.getFirstName(), user.getLastName(),
                 user.getUserName(), user.isActive(), user.getUserNumber()));
     }
 
     public Iterable<User> getAllUsers(int page, int limit) {
-
-//        userRepository.findAll(PageRequest.of(page, limit)).forEach(System.out::println);
-
         return userRepository.findAll(PageRequest.of(page, limit)).getContent();
     }
 

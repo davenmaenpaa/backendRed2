@@ -36,6 +36,7 @@ public final class TeamResource {
     @AuthBinding
     public Response createTeam(Team team) {
         Team result = service.createTeam(team);
+        
         return Response.status(CREATED).header("Location", "Team/" + result.getId()).build();
     }
 

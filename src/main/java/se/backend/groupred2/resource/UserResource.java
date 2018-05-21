@@ -28,6 +28,7 @@ public final class UserResource {
     @AuthBinding
     public Response createUser(User user) {
         User result = service.createUser(user);
+
         return Response.status(CREATED).header("Location", "Users/" + result.getId()).build();
     }
 

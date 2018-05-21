@@ -90,7 +90,7 @@ public final class TaskService {
                 throw new InvalidTaskException("That user is not active");
             } else if (taskItems.size() > 4) {
                 throw new InvalidTaskException("To many tasks for that user, Max = 5");
-            } // kolla så user inte redan har samma task?
+            }
 
             Task temp = taskResult.get();
             temp.setUser(userResult.get());
@@ -153,10 +153,10 @@ public final class TaskService {
         return allTasks;
     }
 
-    private void validateTask(Task task) { //Lägg till empty också?
+    private void validateTask(Task task) {
         if (task.getTitle().isEmpty() || task.getTitle() == null || task.getDescription() == null || task.getStatus() == null) {
             throw new InvalidTaskException("Title, description and status have to have values. Can not leave empty");
-        }  //lägg till så att man kollar om status är korrekt också.
+        }
     }
 
     private void validateStatus(String status) {
@@ -167,7 +167,6 @@ public final class TaskService {
 
     private Task serverSideEvent(Task task) {
         Client client = ClientBuilder.newClient();
-
         WebTarget target = client.target("http://localhost:8080").path("tasks/events");
 
         target.request(MediaType.TEXT_PLAIN_TYPE)
@@ -175,5 +174,4 @@ public final class TaskService {
 
         return task;
     }
-
 }

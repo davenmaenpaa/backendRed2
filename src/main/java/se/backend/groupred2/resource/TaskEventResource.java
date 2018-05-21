@@ -12,8 +12,8 @@ import javax.ws.rs.sse.SseEventSink;
 @Singleton
 @Path("tasks/events")
 public final class TaskEventResource {
-    private Sse sse;
-    private SseBroadcaster broadcaster;
+    private final Sse sse;
+    private final SseBroadcaster broadcaster;
 
     public TaskEventResource(@Context final Sse sse) {
         this.sse = sse;

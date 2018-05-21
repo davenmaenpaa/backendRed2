@@ -31,11 +31,9 @@ public final class IssueService {
 
         return taskResult.map(t -> {
             Task task = taskResult.get();
-
             validate(task);
 
             taskRepository.save(task);
-
             issue.setTask(task);
 
             return issueRepository.save(issue);
