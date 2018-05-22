@@ -66,6 +66,13 @@ public final class TeamResource {
         return Response.status(CREATED).header("Location", "Team/" + result.getId()).build();
     }
 
+    @PATCH
+    @Path("{id}")
+    public Team patchTeam(@PathParam("id") Long id, Team team) {
+        System.out.println(team.toString());
+        return team;
+    }
+
     @PUT
     @Path("{id}/users/")
     public Response addUserToTeam(@PathParam("id") Long teamId, User user) {

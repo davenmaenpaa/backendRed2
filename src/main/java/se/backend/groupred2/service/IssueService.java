@@ -22,6 +22,10 @@ public final class IssueService {
         this.taskRepository = taskRepository;
     }
 
+    public Iterable<Issue> getAllIssues(int page, int limit) {
+        return issueRepository.findAll(PageRequest.of(page, limit)).getContent();
+    }
+
     public List<Task> getAllTasksWithIssues(int page, int limit) {
         List<Task> result = issueRepository.findDistinctOnTask(PageRequest.of(page, limit)).getContent();
 

@@ -9,7 +9,6 @@ import javax.ws.rs.ext.Provider;
 import static java.util.Collections.singletonMap;
 import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
 
-
 @Provider
 public final class InvalidUserMapper implements ExceptionMapper<InvalidUserException> {
 

@@ -11,4 +11,6 @@ public interface IssueRepository extends PagingAndSortingRepository<Issue, Long>
 
     @Query("SELECT DISTINCT i.task FROM Issue i")
     Page<Task> findDistinctOnTask(Pageable pageable);
+
+    Page<Issue> findAll(Pageable pageable);
 }
