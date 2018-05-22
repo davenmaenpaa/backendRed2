@@ -29,16 +29,16 @@ public final class TeamService {
     public Optional<Team> deActivate(Long teamId) {
         Optional<Team> result = teamRepository.findById(teamId);
 
-        result.ifPresent(t -> {
-            checkIfActive(t);
-            t.deActivate();
+        result.ifPresent(team -> {
+            ifActive(team);
+            team.deActivate();
             teamRepository.save(result.get());
         });
 
         return result;
     }
 
-    private void checkIfActive(Team team) {
+    private void ifActive(Team team) {
         if (!team.isActive())
             throw new InvalidTeamException("Team is already inactive.");
     }
@@ -63,16 +63,8 @@ public final class TeamService {
         return teams;
     }
 
-    public Team getTeam(Long teamId) {
-        Optional<Team> result = teamRepository.findById(teamId);
-        Team team;
-
-        if(result.isPresent())
-            team = result.get();
-        else
-            throw new InvalidTeamException("Team does not exist.");
-
-        return team;
+    public Optional<Team> getTeam(Long teamId) {
+        return teamRepository.findById(teamId);
     }
 
     public Optional<User> addUserToTeam(Long teamId, Long userId) {

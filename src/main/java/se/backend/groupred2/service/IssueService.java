@@ -7,9 +7,9 @@ import se.backend.groupred2.model.Task.Task;
 import se.backend.groupred2.model.Task.TaskStatus;
 import se.backend.groupred2.repository.IssueRepository;
 import se.backend.groupred2.repository.TaskRepository;
-import se.backend.groupred2.service.exceptions.InvalidInputException;
-import se.backend.groupred2.service.exceptions.InvalidTaskException;
+import se.backend.groupred2.service.exceptions.*;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -22,8 +22,13 @@ public final class IssueService {
         this.taskRepository = taskRepository;
     }
 
-    public Iterable<Task> getAllTasksWithIssues(int page, int limit) {
-        return issueRepository.findDistinctOnTask(PageRequest.of(page, limit)).getContent();
+    public List<Task> getAllTasksWithIssues(int page, int limit) {
+        List<Task> result = issueRepository.findDistinctOnTask(PageRequest.of(page, limit)).getContent();
+
+        if (result.isEmpty())
+            throw new NoContentException();
+
+        return result;
     }
 
     public Issue createIssue(Long taskid, Issue issue) {
@@ -40,25 +45,25 @@ public final class IssueService {
         }).orElseThrow(() -> new InvalidTaskException("Task doesn't exist"));
     }
 
-    public Optional<Issue> update(Long issueId, Issue issue) {
+    public Issue update(Long issueId, Issue issue) {
         Optional<Issue> result = issueRepository.findById(issueId);
 
         return result.map(i -> {
             if (issue.getTitle() != null && issue.getDescription() != null) {
-                i.setTitle(issue.getTitle());
-                i.setDescription(issue.getDescription());
+                i.setTitle(issue.getTitle()).setDescription(issue.getDescription());
 
             } else if (issue.getTitle() != null) {
                 i.setTitle(issue.getTitle());
-
             } else if (issue.getDescription() != (null)) {
                 i.setDescription(issue.getDescription());
+            } else {
+                throw new BadRequestException();
             }
 
             issueRepository.save(result.get());
 
-            return result;
-        }).orElseThrow(InvalidInputException::new);
+            return i;
+        }).orElseThrow(NotFoundException::new);
     }
 
     private void validate(Task task) {

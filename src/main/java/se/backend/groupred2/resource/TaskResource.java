@@ -29,7 +29,7 @@ public final class TaskResource {
     public Response getTask(@PathParam("id") Long id) {
         return taskService.getTask(id)
                 .map(Response::ok)
-                .orElse(Response.status(NOT_FOUND))
+                .orElse(Response.status(NO_CONTENT))
                 .build();
     }
 

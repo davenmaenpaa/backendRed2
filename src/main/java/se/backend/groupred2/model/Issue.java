@@ -42,15 +42,17 @@ public final class Issue {
         this.task = task;
     }
 
-    public void setDescription(String description) {
+    public Issue setDescription(String description) {
         this.description = description;
+        return this;
     }
 
     public String getTitle() {
         return title;
     }
 
-    public void setTitle(String title) {
+    public Issue setTitle(String title) {
         this.title = title;
+        return this;
     }
 }

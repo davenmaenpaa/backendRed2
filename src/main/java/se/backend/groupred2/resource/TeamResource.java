@@ -33,13 +33,18 @@ public final class TeamResource {
     }
 
     @GET
-    public Response getAllTeams() {
-        return Response.ok(teamService.getAllTeams()).build();
+    public List<Team> getAllTeams() {
+        return teamService.getAllTeams();
     }
 
     @GET
     @Path("{id}")
-    public Response getTeam(@PathParam("id") Long id) { return Response.ok(teamService.getTeam(id)).build(); }
+    public Response getTeam(@PathParam("id") Long id) {
+        return teamService.getTeam(id)
+                .map(u -> Response.status(OK))
+                .orElse(Response.status((NO_CONTENT)))
+                .build();
+    }
 
     @GET
     @Path("{id}/users")

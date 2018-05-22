@@ -11,6 +11,7 @@ import se.backend.groupred2.repository.TaskStatusRepository;
 import se.backend.groupred2.repository.UserRepository;
 import se.backend.groupred2.service.exceptions.InvalidInputException;
 import se.backend.groupred2.service.exceptions.InvalidTaskException;
+import se.backend.groupred2.service.exceptions.NoContentException;
 
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
@@ -41,8 +42,13 @@ public final class TaskService {
         return serverSideEvent(taskRepository.save(new Task(task.getTitle(), task.getDescription(), task.getStatus())));
     }
 
-    public Iterable<Task> getAllTasks(int page, int limit) {
-        return taskRepository.findAll(PageRequest.of(page, limit)).getContent();
+    public List<Task> getAllTasks(int page, int limit) {
+        List<Task> result = taskRepository.findAll(PageRequest.of(page, limit)).getContent();
+
+        if (result.isEmpty())
+            throw new NoContentException();
+
+        return result;
     }
 
     public Optional<Task> getTask(Long id) {

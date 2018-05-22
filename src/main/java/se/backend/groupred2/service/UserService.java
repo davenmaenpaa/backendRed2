@@ -9,10 +9,11 @@ import se.backend.groupred2.repository.TaskRepository;
 import se.backend.groupred2.repository.UserRepository;
 import se.backend.groupred2.service.exceptions.InvalidInputException;
 import se.backend.groupred2.service.exceptions.InvalidUserException;
+import se.backend.groupred2.service.exceptions.NoContentException;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
+
 
 @Service
 public final class UserService {
@@ -31,33 +32,39 @@ public final class UserService {
                 user.getUserName(), user.isActive(), user.getUserNumber()));
     }
 
-    public Iterable<User> getAllUsers(int page, int limit) {
+    public List<User> getAllUsers(int page, int limit) {
+        List<User> users = userRepository.findAll(PageRequest.of(page, limit)).getContent();
+
+        if (users.isEmpty())
+            throw new NoContentException();
+
         return userRepository.findAll(PageRequest.of(page, limit)).getContent();
     }
 
-    public Optional<User> update(User user) {
+    public Optional<User> update(Long id, User user) {
         validate(user);
 
-        Optional<User> result = userRepository.findById(user.getId());
+        Optional<User> result = userRepository.findById(id);
 
-        result.ifPresent(t -> {
-            t.setFirstName(user.getFirstName());
-            t.setLastName(user.getLastName());
-            t.setUserName(user.getUserName());
-            t.setUserNumber(user.getUserNumber());
-            t.setActive(user.isActive());
+        result.ifPresent(u -> {
+            u.setFirstName(user.getFirstName())
+                    .setLastName(user.getLastName())
+                    .setUserName(user.getUserName())
+                    .setUserNumber(user.getUserNumber())
+                    .setActive(user.isActive());
+
             userRepository.save(result.get());
         });
 
         return result;
     }
 
-    public Optional<User> deActivate(User user) {
-        Optional<User> result = userRepository.findById(user.getId());
+    public Optional<User> deActivate(Long id) {
+        Optional<User> result = userRepository.findById(id);
 
         result.ifPresent(t -> {
             t.deActivate();
-            List<Task> tasks = getAllTasksByUserId(result.get().getId());
+            Iterable<Task> tasks = getAllTasksByUserId(result.get().getId());
 
             tasks.forEach(task -> {
                 task.setStatus(TaskStatus.UNSTARTED);
@@ -70,7 +77,7 @@ public final class UserService {
         return result;
     }
 
-    private List<Task> getAllTasksByUserId(Long userkId) {
+    private Iterable<Task> getAllTasksByUserId(Long userkId) {
         return taskRepository.findAllByUser_Id(userkId);
     }
 
@@ -82,11 +89,12 @@ public final class UserService {
 
             } else if ((!firstName.equals("0"))) {
                 return userRepository.findUserByFirstName(firstName);
+
             } else if (!lastName.equals("0")) {
 
                 return userRepository.findUserByLastName(lastName);
             }
-            
+
         } else if ((userNumber != 0)) {
             return userRepository.findByUserNumber(userNumber);
 

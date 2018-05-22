@@ -59,18 +59,18 @@ public final class UserResource {
     }
 
     @PUT
-    @Path("update")
-    public Response update(User user) {
-        return userService.update(user)
+    @Path("{id}")
+    public Response update(@PathParam("id") Long id, User user) {
+        return userService.update(id, user)
                 .map(t -> Response.status(OK))
                 .orElse(Response.status(NOT_FOUND))
                 .build();
     }
 
     @PUT
-    @Path("deactivate")
-    public Response deActivate(User user) {
-        return userService.deActivate(user)
+    @Path("{id}/deactivate")
+    public Response deActivate(@PathParam("id") Long id) {
+        return userService.deActivate(id)
                 .map(t -> Response.status(OK))
                 .orElse(Response.status(NOT_FOUND))
                 .build();

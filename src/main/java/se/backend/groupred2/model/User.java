@@ -67,24 +67,29 @@ public final class User {
         return team;
     }
 
-    public void setFirstName(String firstName) {
+    public User setFirstName(String firstName) {
         this.firstName = firstName;
+        return this;
     }
 
-    public void setLastName(String lastName) {
+    public User setLastName(String lastName) {
         this.lastName = lastName;
+        return this;
     }
 
-    public void setUserName(String userName) {
+    public User setUserName(String userName) {
         this.userName = userName;
+        return this;
     }
 
-    public void setActive(boolean active) {
+    public User setActive(boolean active) {
         this.active = active;
+        return this;
     }
 
-    public void setUserNumber(Long userNumber) {
+    public User setUserNumber(Long userNumber) {
         this.userNumber = userNumber;
+        return this;
     }
 
     public void deActivate() {

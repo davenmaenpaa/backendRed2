@@ -53,10 +53,7 @@ public final class IssueResource {
 
     @PUT
     @Path("issues/{id}")
-    public Response update(@PathParam("id") Long id, Issue issue) {
-        return issueService.update(id, issue)
-                .map(t -> Response.status(OK))
-                .orElse(Response.status(NOT_FOUND))
-                .build();
+    public Issue update(@PathParam("id") Long id, Issue issue) {
+        return issueService.update(id, issue);
     }
 }
