@@ -9,6 +9,7 @@ import se.backend.groupred2.model.User;
 import se.backend.groupred2.repository.TaskRepository;
 import se.backend.groupred2.repository.TaskStatusRepository;
 import se.backend.groupred2.repository.UserRepository;
+import se.backend.groupred2.service.exceptions.BadRequestException;
 import se.backend.groupred2.service.exceptions.InvalidInputException;
 import se.backend.groupred2.service.exceptions.InvalidTaskException;
 import se.backend.groupred2.service.exceptions.NoContentException;
@@ -71,6 +72,11 @@ public final class TaskService {
         if (taskResult.isPresent()) {
 
             Task updatedTask = taskResult.get();
+
+            if (updatedTask.getStatus().equals(task.getStatus())) {
+                throw new BadRequestException();
+            }
+
             updatedTask.setStatus(task.getStatus());
 
             taskStatusRepository.save(new TaskStatusDate(updatedTask, LocalDate.now(), updatedTask.getStatus()));
