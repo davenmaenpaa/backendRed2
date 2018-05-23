@@ -14,7 +14,6 @@ import se.backend.groupred2.service.exceptions.NoContentException;
 import java.util.List;
 import java.util.Optional;
 
-
 @Service
 public final class UserService {
     private final UserRepository userRepository;
@@ -94,12 +93,6 @@ public final class UserService {
 
                 return userRepository.findUserByLastName(lastName);
             }
-
-        } else if ((userNumber != 0)) {
-            return userRepository.findByUserNumber(userNumber);
-
-        } else {
-            throw new InvalidInputException();
         }
 
         return null;

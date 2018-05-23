@@ -42,7 +42,7 @@ public final class TaskService {
         taskRepository.save(task);
         taskStatusRepository.save(new TaskStatusDate(task, LocalDate.now(), task.getStatus()));
 
-        return serverSideEvent(task);
+        return task;
     }
 
     public List<Task> getAllTasks(int page, int limit) {
@@ -165,13 +165,13 @@ public final class TaskService {
             throw new InvalidTaskException("Incorrect status, have to be UNSTARTED, STARTED or DONE");
     }
 
-    private Task serverSideEvent(Task task) {
-        Client client = ClientBuilder.newClient();
-        WebTarget target = client.target("http://localhost:8080").path("tasks/events");
-
-        target.request(MediaType.TEXT_PLAIN_TYPE)
-                .post(Entity.entity(task.toString(), MediaType.TEXT_PLAIN));
-
-        return task;
-    }
+//    private Task serverSideEvent(Task task) {
+//        Client client = ClientBuilder.newClient();
+//        WebTarget target = client.target("http://localhost:8080").path("tasks/events");
+//
+//        target.request(MediaType.TEXT_PLAIN_TYPE)
+//                .post(Entity.entity(task.toString(), MediaType.TEXT_PLAIN));
+//
+//        return task;
+//    }
 }

@@ -1,27 +1,49 @@
 package se.backend.groupred2.resource;
 
-import org.springframework.stereotype.Component;
 import se.backend.groupred2.model.Task.Task;
+import se.backend.groupred2.model.Team;
 import se.backend.groupred2.model.User;
 import se.backend.groupred2.resource.filter.AuthBinding;
 import se.backend.groupred2.service.TaskService;
 
+import javax.inject.Singleton;
 import javax.ws.rs.*;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.sse.OutboundSseEvent;
+import javax.ws.rs.sse.Sse;
+import javax.ws.rs.sse.SseBroadcaster;
+import javax.ws.rs.sse.SseEventSink;
+import java.util.HashMap;
 import java.util.List;
 
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 import static javax.ws.rs.core.Response.Status.*;
 
-@Component
+@Singleton
 @Consumes(APPLICATION_JSON)
 @Produces(APPLICATION_JSON)
 @Path("tasks")
 public final class TaskResource {
     private final TaskService taskService;
+    private final Sse sse;
+    private final SseBroadcaster broadcaster;
 
-    public TaskResource(TaskService taskService) {
+    public TaskResource(TaskService taskService, @Context final Sse sse) {
         this.taskService = taskService;
+        this.sse = sse;
+        this.broadcaster = sse.newBroadcaster();
+    }
+
+    @GET
+    public Response getAllTasks(@QueryParam("status") String status,
+                                @QueryParam("page") @DefaultValue("0") int page,
+                                @QueryParam("limit") @DefaultValue("10") int limit) {
+        if (status == null)
+            return Response.ok(taskService.getAllTasks(page, limit)).build();
+
+        return Response.ok(taskService.getAllTasksByStatus(status, page, limit)).build();
     }
 
     @GET
@@ -34,19 +56,16 @@ public final class TaskResource {
     }
 
     @GET
-    public Response getAllTasks(@QueryParam("status") String status,
-                                      @QueryParam("page") @DefaultValue("0") int page,
-                                      @QueryParam("limit") @DefaultValue("10") int limit) {
-        if (status == null)
-            return Response.ok(taskService.getAllTasks(page, limit)).build();
-
-        return Response.ok(taskService.getAllTasksByStatus(status, page, limit)).build();
+    @Path("events")
+    @Produces(MediaType.SERVER_SENT_EVENTS)
+    public void listenToBroadcast(@Context SseEventSink eventSink) {
+        this.broadcaster.register(eventSink);
     }
 
     @GET
     @Path("description")
     public List<Task> getAllTasksByDescription(@QueryParam("desc") String description,
-                                               @QueryParam("page") @DefaultValue("0") int page ,
+                                               @QueryParam("page") @DefaultValue("0") int page,
                                                @QueryParam("limit") @DefaultValue("10") int limit) {
         return taskService.getAllTasksByDescription(description, page, limit);
     }
@@ -55,6 +74,7 @@ public final class TaskResource {
     @POST
     public Response createTask(Task task) {
         Task result = taskService.createTask(task);
+        notifyListeners(task);
 
         return Response.status(CREATED).header("Location", "Tasks/" + result.getId()).build();
     }
@@ -66,6 +86,12 @@ public final class TaskResource {
                 .map(t -> Response.status(NO_CONTENT))
                 .orElse(Response.status(NOT_FOUND))
                 .build();
+    }
+
+    @PATCH
+    @Path("{id}")
+    public void partialUpdateTask (@PathParam("id") long id, HashMap partial) {
+        System.out.println(partial.get("description"));
     }
 
     @PUT
@@ -84,6 +110,16 @@ public final class TaskResource {
                 .map(task -> Response.status(NO_CONTENT))
                 .orElse(Response.status(NOT_FOUND))
                 .build();
+    }
+
+    private void notifyListeners(Task task) {
+        final OutboundSseEvent event = sse.newEventBuilder()
+                .name("Task")
+                .mediaType(MediaType.TEXT_PLAIN_TYPE)
+                .data(String.class, task.toString())
+                .build();
+
+        broadcaster.broadcast(event);
     }
 }
 
