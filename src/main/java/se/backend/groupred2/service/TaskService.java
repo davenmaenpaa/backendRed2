@@ -69,9 +69,10 @@ public final class TaskService {
 
             Task updatedTask = taskResult.get();
             updatedTask.setStatus(task.getStatus());
-            TaskStatusDate taskStatus = new TaskStatusDate(updatedTask, LocalDate.now(), updatedTask.getStatus());
 
-            taskStatusRepository.save(taskStatus);
+//            TaskStatusDate taskStatus = new TaskStatusDate(updatedTask, LocalDate.now(), updatedTask.getStatus());
+
+            taskStatusRepository.save(new TaskStatusDate(updatedTask, LocalDate.now(), updatedTask.getStatus()));
             taskRepository.save(updatedTask);
 
         } else {

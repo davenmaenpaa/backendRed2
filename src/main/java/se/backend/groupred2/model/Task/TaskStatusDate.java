@@ -10,7 +10,7 @@ public final class TaskStatusDate {
     @GeneratedValue(strategy=GenerationType.IDENTITY)
     private long id;
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.LAZY)
     private Task task;
 
     @Column(nullable = false)
