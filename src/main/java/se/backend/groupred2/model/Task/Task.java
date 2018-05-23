@@ -18,7 +18,7 @@ public final class Task {
     @Enumerated(EnumType.STRING)
     private TaskStatus status;
 
-    @ManyToOne(fetch = FetchType.EAGER) //TODO
+    @ManyToOne(fetch = FetchType.LAZY)
     @JsonBackReference
     private User user;
 

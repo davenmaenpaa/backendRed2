@@ -39,7 +39,10 @@ public final class TaskService {
     public Task createTask(Task task) {
         validateTask(task);
 
-        return serverSideEvent(taskRepository.save(new Task(task.getTitle(), task.getDescription(), task.getStatus())));
+        taskRepository.save(task);
+        taskStatusRepository.save(new TaskStatusDate(task, LocalDate.now(), task.getStatus()));
+
+        return serverSideEvent(task);
     }
 
     public List<Task> getAllTasks(int page, int limit) {
@@ -69,8 +72,6 @@ public final class TaskService {
 
             Task updatedTask = taskResult.get();
             updatedTask.setStatus(task.getStatus());
-
-//            TaskStatusDate taskStatus = new TaskStatusDate(updatedTask, LocalDate.now(), updatedTask.getStatus());
 
             taskStatusRepository.save(new TaskStatusDate(updatedTask, LocalDate.now(), updatedTask.getStatus()));
             taskRepository.save(updatedTask);
