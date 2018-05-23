@@ -1,9 +1,11 @@
 package se.backend.groupred2.resource;
 
+import se.backend.groupred2.model.Issue;
 import se.backend.groupred2.model.Task.Task;
-import se.backend.groupred2.model.Team;
+import se.backend.groupred2.model.Task.TaskStatus;
 import se.backend.groupred2.model.User;
 import se.backend.groupred2.resource.filter.AuthBinding;
+import se.backend.groupred2.service.IssueService;
 import se.backend.groupred2.service.TaskService;
 
 import javax.inject.Singleton;
@@ -15,7 +17,6 @@ import javax.ws.rs.sse.OutboundSseEvent;
 import javax.ws.rs.sse.Sse;
 import javax.ws.rs.sse.SseBroadcaster;
 import javax.ws.rs.sse.SseEventSink;
-import java.util.HashMap;
 import java.util.List;
 
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
@@ -27,11 +28,13 @@ import static javax.ws.rs.core.Response.Status.*;
 @Path("tasks")
 public final class TaskResource {
     private final TaskService taskService;
+    private final IssueService issueService;
     private final Sse sse;
     private final SseBroadcaster broadcaster;
 
-    public TaskResource(TaskService taskService, @Context final Sse sse) {
+    public TaskResource(TaskService taskService, IssueService issueService, @Context final Sse sse) {
         this.taskService = taskService;
+        this.issueService = issueService;
         this.sse = sse;
         this.broadcaster = sse.newBroadcaster();
     }
@@ -63,6 +66,12 @@ public final class TaskResource {
     }
 
     @GET
+    @Path("issues")
+    public Response getAllTasksWithIssues(@QueryParam("page") @DefaultValue("0") int page, @QueryParam("limit") @DefaultValue("10") int limit) {
+        return Response.ok(issueService.getAllTasksWithIssues(page, limit)).build();
+    }
+
+    @GET
     @Path("description")
     public List<Task> getAllTasksByDescription(@QueryParam("desc") String description,
                                                @QueryParam("page") @DefaultValue("0") int page,
@@ -79,6 +88,18 @@ public final class TaskResource {
         return Response.status(CREATED).header("Location", "Tasks/" + result.getId()).build();
     }
 
+
+    @POST
+    @AuthBinding
+    @Path("{id}/issues")
+    public Response createIssue(@PathParam("id") Long taskId, Issue issue) {
+        Issue result = issueService.createIssue(taskId, issue);
+
+        taskService.updateStatus(taskId, new Task(TaskStatus.UNSTARTED));
+
+        return Response.status(CREATED).header("Location", "Teams/Issues/" + result.getId()).build();
+    }
+
     @PUT
     @Path("{id}/adduser")
     public Response addUserToTask(@PathParam("id") Long id, User user) {
@@ -88,12 +109,6 @@ public final class TaskResource {
                 .build();
     }
 
-    @PATCH
-    @Path("{id}")
-    public void partialUpdateTask (@PathParam("id") long id, HashMap partial) {
-        System.out.println(partial.get("description"));
-    }
-
     @PUT
     @Path("{id}")
     public Response updateTask(@PathParam("id") Long id, Task task) {
@@ -101,6 +116,12 @@ public final class TaskResource {
                 .map(Response::ok)
                 .orElse(Response.status(NOT_FOUND))
                 .build();
+    }
+
+    @PUT
+    @Path("issues/{id}")
+    public Issue update(@PathParam("id") Long id, Issue issue) {
+        return issueService.update(id, issue);
     }
 
     @DELETE
