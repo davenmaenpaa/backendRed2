@@ -1,13 +1,9 @@
 package se.backend.groupred2.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import org.hibernate.annotations.Cascade;
-import org.hibernate.annotations.Fetch;
-import org.hibernate.sql.Update;
 
 import javax.persistence.*;
-import java.util.Collection;
+
 
 @Entity
 public final class User {
