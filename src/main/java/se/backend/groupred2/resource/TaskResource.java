@@ -83,11 +83,11 @@ public final class TaskResource {
     @POST
     public Response createTask(Task task) {
         Task result = taskService.createTask(task);
+		
         notifyListeners(task);
 
         return Response.status(CREATED).header("Location", "Tasks/" + result.getId()).build();
     }
-
 
     @POST
     @AuthBinding
