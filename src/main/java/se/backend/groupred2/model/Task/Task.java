@@ -70,14 +70,14 @@ public final class Task {
         return user;
     }
 
-    public void setUser(User user) {
+    public Task setUser(User user) {
         this.user = user;
+        return this;
     }
 
     @Override
     public String toString() {
-        return "Task{" +
-                "id=" + id +
+        return "id=" + id +
                 ", title='" + title + '\'' +
                 ", description='" + description + '\'' +
                 ", status=" + status +
