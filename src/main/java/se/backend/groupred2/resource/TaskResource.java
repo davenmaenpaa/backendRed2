@@ -17,6 +17,7 @@ import javax.ws.rs.sse.OutboundSseEvent;
 import javax.ws.rs.sse.Sse;
 import javax.ws.rs.sse.SseBroadcaster;
 import javax.ws.rs.sse.SseEventSink;
+import java.util.HashMap;
 import java.util.List;
 
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
@@ -100,13 +101,10 @@ public final class TaskResource {
         return Response.status(CREATED).header("Location", "Teams/Issues/" + result.getId()).build();
     }
 
-    @PUT
-    @Path("{id}/adduser")
-    public Response addUserToTask(@PathParam("id") Long id, User user) {
-        return taskService.addUserToTask(id, user.getId())
-                .map(t -> Response.status(NO_CONTENT))
-                .orElse(Response.status(NOT_FOUND))
-                .build();
+    @PATCH
+    @Path("{id}")
+    public Task partialUpdateTask(@PathParam("id") long id, HashMap partialUpdate) {
+        return taskService.partialUpdate(id, partialUpdate);
     }
 
     @PUT

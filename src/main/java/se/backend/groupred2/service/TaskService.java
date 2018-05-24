@@ -9,9 +9,7 @@ import se.backend.groupred2.model.User;
 import se.backend.groupred2.repository.TaskRepository;
 import se.backend.groupred2.repository.TaskStatusRepository;
 import se.backend.groupred2.repository.UserRepository;
-import se.backend.groupred2.service.exceptions.InvalidInputException;
-import se.backend.groupred2.service.exceptions.InvalidTaskException;
-import se.backend.groupred2.service.exceptions.NoContentException;
+import se.backend.groupred2.service.exceptions.*;
 
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
@@ -20,8 +18,10 @@ import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.MediaType;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
@@ -43,6 +43,36 @@ public final class TaskService {
         taskStatusRepository.save(new TaskStatusDate(task, LocalDate.now(), task.getStatus()));
 
         return task;
+    }
+
+    public Task partialUpdate(Long id, HashMap hashMap) {
+        Optional<Task> taskResult = taskRepository.findById(id);
+
+        return taskResult.map(task -> {
+            if (hashMap.isEmpty()) {
+                throw new BadRequestException();
+
+            } else if (hashMap.containsKey("description")) {
+                task.setDescription(hashMap.get("description").toString());
+
+            } else if (hashMap.containsKey("title")) {
+                task.setDescription(hashMap.get("title").toString());
+
+            } else if (hashMap.containsKey("status")) {
+                String status = hashMap.get("status").toString();
+                task.setStatus(validateStatus(status));
+
+                taskStatusRepository.save(new TaskStatusDate(task, LocalDate.now(), task.getStatus()));
+
+            } else if (hashMap.containsKey("user")) {
+                long userId = Long.valueOf(hashMap.get("user").toString());
+                Optional<User> userResult = userRepository.findById(userId);
+
+                userResult.map(task::setUser).orElseThrow(() -> new InvalidUserException("User does not exist"));
+            }
+
+            return taskRepository.save(task);
+        }).orElseThrow(BadRequestException::new);
     }
 
     public List<Task> getAllTasks(int page, int limit) {
@@ -160,18 +190,10 @@ public final class TaskService {
             throw new InvalidInputException();
     }
 
-    private void validateStatus(String status) {
+    private TaskStatus validateStatus(String status) {
         if (!status.equals("UNSTARTED") && !status.equals("STARTED") && !status.equals("DONE"))
             throw new InvalidTaskException("Incorrect status, have to be UNSTARTED, STARTED or DONE");
-    }
 
-//    private Task serverSideEvent(Task task) {
-//        Client client = ClientBuilder.newClient();
-//        WebTarget target = client.target("http://localhost:8080").path("tasks/events");
-//
-//        target.request(MediaType.TEXT_PLAIN_TYPE)
-//                .post(Entity.entity(task.toString(), MediaType.TEXT_PLAIN));
-//
-//        return task;
-//    }
+        return TaskStatus.valueOf(status);
+    }
 }

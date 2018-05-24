@@ -70,8 +70,9 @@ public final class Task {
         return user;
     }
 
-    public void setUser(User user) {
+    public Task setUser(User user) {
         this.user = user;
+        return this;
     }
 
     @Override
