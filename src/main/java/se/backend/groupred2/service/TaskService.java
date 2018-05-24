@@ -113,30 +113,6 @@ public final class TaskService {
         return taskResult;
     }
 
-    public Optional<Task> addUserToTask(Long id, Long userId) {
-        Optional<Task> taskResult = taskRepository.findById(id);
-        Optional<User> userResult = userRepository.findById(userId);
-
-        List<Task> taskItems = taskRepository.findAllTaskByUserId(userId);
-
-        if (taskResult.isPresent() && userResult.isPresent()) {
-            if (!userResult.get().isActive()) {
-                throw new InvalidTaskException("That user is not active");
-
-            } else if (taskItems.size() > 4) {
-                throw new InvalidTaskException("To many tasks for that user, Max = 5");
-            }
-
-            Task temp = taskResult.get();
-            temp.setUser(userResult.get());
-            taskRepository.save(temp);
-
-            return taskResult;
-        } else {
-            throw new InvalidTaskException("Could not find a user or task");
-        }
-    }
-
     public List<Task> getAllTasksByStatus(String status, int page, int limit) {
         validateStatus(status);
 
