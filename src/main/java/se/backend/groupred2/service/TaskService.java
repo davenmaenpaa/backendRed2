@@ -56,7 +56,7 @@ public final class TaskService {
                 task.setDescription(hashMap.get("description").toString());
 
             } else if (hashMap.containsKey("title")) {
-                task.setDescription(hashMap.get("title").toString());
+                task.setTitle(hashMap.get("title").toString());
 
             } else if (hashMap.containsKey("status")) {
                 String status = hashMap.get("status").toString();
